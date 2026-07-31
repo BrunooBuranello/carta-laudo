@@ -17,3 +17,9 @@ output/
 # Arquivos temporários do Office
 ~$*.xlsx
 ~$*.docx
+
+# Arquivos de entrada
+input/*.xlsx
+input/*.docx
+input/*.pdf
+

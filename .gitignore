@@ -1,0 +1,19 @@
+# Ambiente virtual
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# PyCharm
+.idea/
+
+# Logs gerados
+logs/*.log
+
+# Documentos gerados
+output/
+
+# Arquivos temporários do Office
+~$*.xlsx
+~$*.docx

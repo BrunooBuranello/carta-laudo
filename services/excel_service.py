@@ -37,6 +37,6 @@ class ExcelService:
     # Leitura do DF, chama o localizador, leitura do excel, e tratamento das colunas.
     def read(self) -> pd.DataFrame:
         file_path = self.file_exists()
-        df = pd.read_excel(file_path,sheet_name=DEFAULT_SHEET_NAME)
+        df = pd.read_excel(file_path,sheet_name=DEFAULT_SHEET_NAME,dtype=str)
         df = self.normalize_columns(df)
         return df

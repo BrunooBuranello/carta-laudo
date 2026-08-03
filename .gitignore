@@ -18,8 +18,10 @@ output/
 ~$*.xlsx
 ~$*.docx
 
-# Arquivos de entrada
-input/*.xlsx
-input/*.docx
-input/*.pdf
+# Arquivos temporários do Office e LibreOffice
+~$*
+.~lock.*
 
+# Arquivos de entrada
+input/*
+!input/.gitkeep

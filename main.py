@@ -1,9 +1,11 @@
 from services.excel_service import ExcelService
+from services.validation_service import ValidationService
 
 excel = ExcelService()
-
+validation = ValidationService()
 try:
-    file_path = excel.read()
+    df = excel.read()
+    df = validation.validate(df)
 
 
 except Exception as error:

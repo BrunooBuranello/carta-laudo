@@ -1,5 +1,13 @@
 import pandas as pd
 from pathlib import Path
+import logging
+
+from services.log_service import NOME_LOGGER
+logger = logging.getLogger(NOME_LOGGER)
+
+# ========================================
+# CONFIGURAÇÕES DO MODULO EXCEL_SERVICE.PY
+# ========================================
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 INPUT_DIR = BASE_DIR / 'input'
@@ -10,6 +18,9 @@ DEFAULT_SHEET_NAME = "Formulario_Carta_Laudo"
 # Class para localização e leitura do excel para gerar o formulario.
 class ExcelService:
 
+    # ========================================
+    # VALIDANDO SE O ARQUIVO EXISTE
+    # ========================================
 
     # Valida se o diretorio existe, se o arquivo existe e se o formato esperado esta correto.
     def file_exists(self, file_name: str = DEFAULT_FILE_NAME) -> Path:
@@ -23,6 +34,9 @@ class ExcelService:
             raise ValueError(f"Arquivo econtrado nao tem a fortamação '.xlsx':\n'{file_path.name}'")
         return file_path
 
+    # ========================================
+    # NORMALIZANDO AS COLUNAS DO ARQUIVO
+    # ========================================
 
     # Normalizar colunas do excel.
     def normalize_columns(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -33,10 +47,19 @@ class ExcelService:
             .str.replace(' ', '_'))
         return df
 
+    # ========================================
+    # ORQUESTRADOR DA CLASS
+    # ========================================
 
     # Leitura do DF, chama o localizador, leitura do excel, e tratamento das colunas.
     def read(self) -> pd.DataFrame:
+
         file_path = self.file_exists()
+        logger.info(f"Lendo o aquivo: {DEFAULT_FILE_NAME}")
         df = pd.read_excel(file_path,sheet_name=DEFAULT_SHEET_NAME,dtype=str)
+        logger.info(f"Normalizando colunas: {DEFAULT_FILE_NAME}")
         df = self.normalize_columns(df)
+
+        logger.info(f"Leitura do arquivo: {DEFAULT_FILE_NAME} concluída.")
+        logger.info("=" * 60)
         return df

@@ -9,7 +9,8 @@ __pycache__/
 .idea/
 
 # Logs gerados
-logs/*.log
+logs/*
+!logs/.gitkeep
 
 # Documentos gerados
 output/

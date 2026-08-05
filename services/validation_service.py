@@ -1,4 +1,13 @@
 import pandas as pd
+import logging
+
+from services.log_service import NOME_LOGGER
+logger = logging.getLogger(NOME_LOGGER)
+
+
+# ========================================
+# DECLARANDO COLUNAS
+# ========================================
 
 REQUIRED_COLUMNS = [
     "veiculo",
@@ -22,14 +31,26 @@ REQUIRED_COLUMNS = [
     "nome_assinante",
 ]
 
+
+# ========================================
+# CRIANDO A CLASS
+# ========================================
+
 class ValidationService:
 
-    def validate_columns(self,df: pd.DataFrame):
+    # ========================================
+    # VALIDANDO COLUNAS OBRIGATÓRIAS
+    # ========================================
+
+    def validate_columns(self,df: pd.DataFrame) -> pd.DataFrame:
         for column in REQUIRED_COLUMNS:
             if column not in df.columns:
                 raise ValueError (f"Coluna: '{column}' não encontrada no arquivo")
         return df
 
+    # ========================================
+    # VALIDANDO COLUNAS VAZIAS
+    # ========================================
 
     def validate_empty(self,df):
         for column in REQUIRED_COLUMNS: # Estou olhando a coluna toda.
@@ -39,6 +60,9 @@ class ValidationService:
                         f"Valor vazio na coluna: '{column}'\n"
                         f"Linha: '{index + 2}' do seu excel.")  # Mostra a Linha onde esta o erro.
 
+    # ========================================
+    # VALIDANDO COLUNA DE CHASSI COM 17 CARACTERES
+    # ========================================
 
     def validate_chassis(self,df):
         for index, chassi in df["chassis"].items():
@@ -50,6 +74,9 @@ class ValidationService:
                     f"Linha: '{index + 2}' do seu Excel."
                 )
 
+    # ========================================
+    # VALIDANDO COLUNA DO MOTOR COM 9 CARACTERES
+    # ========================================
 
     def validate_motor(self,df):
         for index, motor in df["motor"].items():
@@ -59,6 +86,9 @@ class ValidationService:
                                   f"Caracteres Esperado: '9'\n"
                                   f"Linha: '{index + 2}' do seu excel.")
 
+    # ========================================
+    # VALIDANDO COLUNA DO DOCUMENTO
+    # ========================================
 
     def validate_cpf_cnpj(self,df):
         for index, document  in df["cpf_cnpj"].items():
@@ -70,12 +100,23 @@ class ValidationService:
                                  f"Caracteres esperados: CPF = 11 ou CNPJ = 14\n"
                                  f"Linha: '{index + 2}' do seu excel.")
 
+    # ========================================
+    # ORQUESTRADOR DAS FUNÇÕES DE VALIDAÇÃO
+    # ========================================
 
     def validate(self,df: pd.DataFrame):
+
+        logger.info("validando colunas obrigatorias")
         self.validate_columns(df)
+        logger.info("validando colunas vazias")
         self.validate_empty(df)
+        logger.info("validando coluna do chassis")
         self.validate_chassis(df)
+        logger.info("validando coluna do motor")
         self.validate_motor(df)
+        logger.info("validando coluna do documento")
         self.validate_cpf_cnpj(df)
 
+        logger.info("Arquivo validado com sucesso")
+        logger.info("=" * 60)
         return df

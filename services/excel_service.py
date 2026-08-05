@@ -14,6 +14,19 @@ INPUT_DIR = BASE_DIR / 'input'
 DEFAULT_FILE_NAME = "formulario_carta_laudo.xlsx"
 DEFAULT_SHEET_NAME = "Formulario_Carta_Laudo"
 
+# ========================================
+# COLUNAS QUE DEVEM SER MAIÚSCULAS
+# ========================================
+
+UPPER_COLUMNS = [
+    "cor",
+    "combustivel",
+    "marca",
+    "tipo_veiculo",
+    "nome_razao_social",
+    "nome_assinante",
+]
+
 
 # Class para localização e leitura do excel para gerar o formulario.
 class ExcelService:
@@ -48,6 +61,23 @@ class ExcelService:
         return df
 
     # ========================================
+    # CONVERTENDO VALORES PARA MAIÚSCULAS
+    # ========================================
+
+    def uppercase_columns(self, df: pd.DataFrame) -> pd.DataFrame:
+
+        for column in UPPER_COLUMNS:
+            if column in df.columns:
+                df[column] = (
+                    df[column]
+                    .fillna("")
+                    .str.strip()
+                    .str.upper()
+                )
+
+        return df
+
+    # ========================================
     # ORQUESTRADOR DA CLASS
     # ========================================
 
@@ -55,11 +85,13 @@ class ExcelService:
     def read(self) -> pd.DataFrame:
 
         file_path = self.file_exists()
-        logger.info(f"Lendo o aquivo: {DEFAULT_FILE_NAME}")
+        logger.info(f"Lendo o aquivo: {file_path.name}")
         df = pd.read_excel(file_path,sheet_name=DEFAULT_SHEET_NAME,dtype=str)
-        logger.info(f"Normalizando colunas: {DEFAULT_FILE_NAME}")
+        logger.info(f"Normalizando colunas: {file_path.name}")
         df = self.normalize_columns(df)
+        df = self.uppercase_columns(df)
 
-        logger.info(f"Leitura do arquivo: {DEFAULT_FILE_NAME} concluída.")
+        logger.info(f"Leitura do arquivo: {file_path.name} concluída.")
         logger.info("=" * 60)
         return df
+

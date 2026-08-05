@@ -1,34 +1,43 @@
 import pandas as pd
 import logging
+from pathlib import Path
+from docxtpl import DocxTemplate
 
 from services.log_service import NOME_LOGGER
 logger = logging.getLogger(NOME_LOGGER)
 
+# ========================================
+# CONFIGURAÇÕES
+# ========================================
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+INPUT_DIR = BASE_DIR / "input"
+DEFAULT_FILE_NAME = "template_carta_laudo.docx"
 
 # ========================================
 # DECLARANDO COLUNAS
 # ========================================
 
 REQUIRED_COLUMNS = [
-    "veiculo",
+    # "veiculo",
     "marca",
     "modelo",
-    "descricao_modelo",
-    "ano_modelo",
-    "tipo_veiculo",
+    # "descricao_modelo",
+    # "ano_modelo",
+    # "tipo_veiculo",
     "chassis",
     "motor",
-    "cor",
-    "potencia",
-    "cilindrada",
-    "combustivel",
-    "cmt",
-    "pbt",
-    "capacidade_passageiros",
-    "nome_razao_social",
-    "cpf_cnpj",
-    "campo_correcao",
-    "nome_assinante",
+    # "cor",
+    # "potencia",
+    # "cilindrada",
+    # "combustivel",
+    # "cmt",
+    # "pbt",
+    # "capacidade_passageiros",
+    # "nome_razao_social",
+    # "cpf_cnpj",
+    # "campo_correcao",
+    # "nome_assinante",
 ]
 
 
@@ -120,3 +129,39 @@ class ValidationService:
         logger.info("Arquivo validado com sucesso")
         logger.info("=" * 60)
         return df
+
+    # ========================================
+    # VALIDANDO CAMPOS OBRIGATÓRIOS NO TEMPLATE
+    # ========================================
+
+    def validate_template(self, file_name: Path = DEFAULT_FILE_NAME) -> None:
+
+        template_path = INPUT_DIR / file_name
+
+        if not template_path.exists():
+            raise FileNotFoundError(
+                f"Template Word não encontrado: '{template_path}'"
+            )
+
+        template = DocxTemplate(template_path)
+
+        template_variables = (
+            template.get_undeclared_template_variables()
+        )
+
+        missing_variables = (
+                set(REQUIRED_COLUMNS) - set(template_variables)
+        )
+
+        if missing_variables:
+            missing_fields = "\n".join(
+                f"- {{{{ {field} }}}}"
+                for field in sorted(missing_variables)
+            )
+
+            raise ValueError(
+                "Campos obrigatórios não encontrados no template Word:\n"
+                f"{missing_fields}"
+            )
+
+        logger.info("Template Word validado com sucesso")

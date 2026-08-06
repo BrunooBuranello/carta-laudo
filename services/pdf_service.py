@@ -190,14 +190,3 @@ class PdfService:
             self.delete_docx(docx_path)
         logger.info("-" * 60)
         return path_pdf
-
-
-
-
-
-
-
-
-
-
-

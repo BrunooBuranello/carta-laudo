@@ -54,5 +54,6 @@ class ContextService:
             len(df),
         )
 
+        logger.info("=" * 60)
         for _, row in df.iterrows():
             yield self.create(row)

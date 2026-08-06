@@ -57,8 +57,6 @@ class TemplateService:
         template = DocxTemplate(file_path)
 
         logger.info("Template carregado com sucesso.")
-        logger.info("=" * 60)
-
         return template
 
     # ========================================
@@ -108,7 +106,6 @@ class TemplateService:
 
         logger.info("Preenchendo template com os dados.")
         template.render(contexto)
-        logger.info("Template preenchido com sucesso.")
 
     # ========================================
     # SALVANDO O ARQUIVO NOVO
@@ -132,6 +129,7 @@ class TemplateService:
 
         logger.info("Documento salvo: %s", caminho_saida.name)
 
+        logger.info("=" * 60)
         return caminho_saida
 
     # ========================================

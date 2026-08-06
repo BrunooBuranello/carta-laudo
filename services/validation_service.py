@@ -115,6 +115,7 @@ class ValidationService:
 
     def validate(self,df: pd.DataFrame):
 
+        logger.info("validando arquivo excel...")
         logger.info("validando colunas obrigatorias")
         self.validate_columns(df)
         logger.info("validando colunas vazias")
@@ -165,3 +166,4 @@ class ValidationService:
             )
 
         logger.info("Template Word validado com sucesso")
+        logger.info("=" * 60)

@@ -51,7 +51,7 @@ class PdfService:
             # ========================================
 
             # Inicia uma nova instância do Microsoft Word
-            word = win32.Dispatch("Word.Application")
+            word = win32.DispatchEx("Word.Application")
 
             # Torna o Word visível na tela
             word.Visible = False
@@ -82,16 +82,29 @@ class PdfService:
                 return None, None
 
 
+    def delete_docx(self, docx_path: Path) -> None:
+        docx_path = Path(docx_path)
 
-    def convert_pdf(self,docx_path: Path) -> Path:
+        if docx_path.is_file():
+            docx_path.unlink()
+            logger.info("DOCX temporário removido: %s", docx_path.name)
+
+
+
+    def convert_pdf(
+            self,
+            docx_path: Path,
+            delete_docx: bool = True,
+    ) -> Path:
 
         docx_path = self.file_exists(docx_path)
         path_pdf = docx_path.with_suffix(".pdf")
         conversor, executavel = self.get_converter()
 
         if conversor is None:
-            logger.error("Nenhum conversor disponível.")
-            return path_pdf
+            raise RuntimeError(
+                "Nenhum conversor disponível: Word ou LibreOffice."
+            )
 
         try:
             # ========================================
@@ -99,41 +112,88 @@ class PdfService:
             # ========================================
             if conversor == "Word":
                 word = executavel
-                documento  = word.Documents.Open(...)
+                documento  = None
 
-                word.Quit()
+                try:
+                    documento = word.Documents.Open(
+                        str(docx_path.resolve())
+                    )
 
-                ...
+                    documento.ExportAsFixedFormat(
+                        OutputFileName=str(path_pdf.resolve()),
+                        ExportFormat=17
+                    )
+
+                    if not path_pdf.is_file():
+                        raise RuntimeError(
+                            f"O Word não gerou o PDF: {path_pdf.name}"
+                        )
+
+                    logger.info(
+                        "Conversão realizada com sucesso: %s",
+                        path_pdf.name
+                    )
+
+                finally:
+                    if documento is not None:
+                        documento.Close(SaveChanges=False)
+
+                    word.Quit()
 
             # ========================================
             # LibreOffice
             # ========================================
             elif conversor == "LibreOffice":
 
-                resultado = subprocess.run([
-                    executavel,
-                    "--headless",
-                    "--convert-to",
-                    "pdf",
-                    docx_path,
-                ])
+                resultado = subprocess.run(
+                    [
+                        str(executavel),
+                        "--headless",
+                        "--convert-to",
+                        "pdf",
+                        "--outdir",
+                        str(docx_path.parent.resolve()),
+                        str(docx_path.resolve()),
+                    ],
+                    capture_output=True,
+                    text=True,
+                )
 
                 if resultado.returncode != 0:
-                    logger.info(f"erro ao converter para pdf...")
+                    raise RuntimeError(
+                        f"Erro do LibreOffice: {resultado.stderr.strip()}"
+                    )
 
-                elif not path_pdf.is_file():
-                    logger.info(f"erro ao converter para pdf...")
+                if not path_pdf.is_file():
+                    raise RuntimeError(
+                        f"O LibreOffice não gerou o PDF: {path_pdf.name}"
+                    )
 
-                else:
-                    logger.info(f"Conversao, realizada com sucesso")
+                logger.info(
+                    "Conversão realizada com sucesso: %s",
+                    path_pdf.name
+                )
 
-        except Exception as e:
-            logger.info(f"erro  {e}")
+        except Exception:
+            logger.exception(
+                "Erro ao converter '%s' para PDF.",
+                docx_path.name
+            )
+            raise
 
+        if not path_pdf.is_file():
+            raise RuntimeError(
+                f"PDF não foi encontrado após a conversão: {path_pdf.name}"
+            )
 
-
+        if delete_docx:
+            self.delete_docx(docx_path)
         logger.info("-" * 60)
         return path_pdf
+
+
+
+
 
 
 

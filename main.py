@@ -17,19 +17,28 @@ def main():
     context_service = ContextService()
     pdf_service = PdfService()
 
+    total_chassis = 0
+    documentos_docx_processados = 0
+    documentos_pdf_gerados = 0
+
     try:
         df = excel.read()
         df = validation.validate(df)
         validation.validate_template()
-        total_chassis = len(df)
-        logger.info("Total de chassis encontrados no arquivo: %s",total_chassis,)
 
-        documentos_gerados = 0
+        total_chassis = len(df)
+
+        logger.info(
+            "Total de chassis encontrados no arquivo: %s",
+            total_chassis,
+        )
+
         for numero, contexto in enumerate(
-            context_service.create_all(df),
-            start=1,
+                context_service.create_all(df),
+                start=1,
         ):
             percentual = (numero / total_chassis) * 100
+
             logger.info(
                 "Progresso: %s/%s | %.1f%% | Chassi: %s",
                 numero,
@@ -37,21 +46,31 @@ def main():
                 percentual,
                 contexto["chassis"],
             )
-            caminho = template_service.generate(contexto)
-            documentos_gerados += 1
-            docx = pdf_service.convert_pdf(caminho)
 
+            caminho_docx = template_service.generate(contexto)
+            documentos_docx_processados += 1
 
+            pdf_path = pdf_service.convert_pdf(
+                caminho_docx,
+                delete_docx=True,
+            )
+
+            documentos_pdf_gerados += 1
 
         logger.info("################### RESUMO DA EXECUÇÃO ###################")
-        logger.info("Status...............: SUCESSO")
-        logger.info("Registros lidos......:%s",total_chassis)
-        logger.info("Documentos gerados...:%s", documentos_gerados)
+        logger.info("Status....................: SUCESSO")
+        logger.info("Registros lidos...........: %s", total_chassis)
+        logger.info("DOCX processados..........: %s", documentos_docx_processados)
+        logger.info("PDFs gerados..............: %s", documentos_pdf_gerados)
         logger.info("##########################################################")
 
     except Exception as error:
         logger.info("################### RESUMO DA EXECUÇÃO ###################")
-        logger.error("Aviso:\n%s", error)
+        logger.info("Status....................: ERRO")
+        logger.info("Registros lidos...........: %s", total_chassis)
+        logger.info("DOCX processados..........: %s", documentos_docx_processados)
+        logger.info("PDFs gerados..............: %s", documentos_pdf_gerados)
+        logger.exception("Erro durante a execução: %s", error)
         logger.info("##########################################################")
         sys.exit(1)
 

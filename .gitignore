@@ -14,6 +14,10 @@ logs/*
 
 # Documentos gerados
 output/
+*.pdf
+*.docx
+output/word/*
+output/pdf/*
 
 # Arquivos temporários do Office
 ~$*.xlsx
@@ -26,3 +30,5 @@ output/
 # Arquivos de entrada
 input/*
 !input/.gitkeep
+
+

@@ -2,6 +2,7 @@ from docxtpl import DocxTemplate
 from pathlib import Path
 import logging
 from datetime import datetime
+import getpass
 
 from services.log_service import NOME_LOGGER
 logger = logging.getLogger(NOME_LOGGER)
@@ -120,9 +121,17 @@ class TemplateService:
         WORD_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
         chassi = contexto["chassis"]
+        veiculo = (
+            contexto["veiculo"]
+            .strip()
+            .replace("/", "_")
+            .replace("\\", "_")
+            .replace(" ", "_")
+        )
+        usuario = getpass.getuser()
         data = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-        nome_arquivo = f"{chassi}_Carta_Laudo_{data}.docx"
+        nome_arquivo = f"{chassi}_Carta_Laudo_{veiculo}_{usuario}_{data}.docx"
         caminho_saida = WORD_OUTPUT_DIR / nome_arquivo
 
         template.save(caminho_saida)

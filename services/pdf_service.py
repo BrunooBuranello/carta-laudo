@@ -15,6 +15,16 @@ caminho_soffice_path = shutil.which("soffice")
 caminho_soffice_1 = Path("C:/Program Files/LibreOffice/program/soffice.exe")
 caminho_soffice_2 = Path("C:/Program Files (x86)/LibreOffice/program/soffice.exe")
 
+# ========================================
+# COPIAR FILE PARA PASTA DA REDE.
+# ========================================
+
+NETWORK_PDF_DIR = Path(
+    r"W:\Business Partner\z_BANCO_DE_DADOS_BUSINESS_PARTNERS"
+    r"\VALIDATION\19 - Outputs\Output_Carta_Laudo"
+    r"\02_Output_PDF_Emitidas"
+)
+
 class PdfService:
 
     def file_exists(self, docx_path: Path) -> Path:
@@ -89,6 +99,40 @@ class PdfService:
             docx_path.unlink()
             logger.info("DOCX temporário removido: %s", docx_path.name)
 
+
+    def transfer_pdf(self, pdf_path: Path) -> Path:
+
+        try:
+            destino = NETWORK_PDF_DIR / pdf_path.name
+
+            shutil.copy2(
+                pdf_path,
+                destino
+            )
+
+            if not destino.is_file():
+                raise RuntimeError(
+                    f"PDF não encontrado após transferência: {destino}"
+                )
+
+            pdf_path.unlink()
+
+            logger.info(
+                "PDF transferido para a rede: %s",
+                destino
+            )
+
+            return destino
+
+        except Exception as error:
+            logger.warning(
+                "Não foi possível transferir o PDF para a rede. "
+                "Arquivo mantido localmente: %s | Erro: %s",
+                pdf_path,
+                error,
+            )
+
+            return pdf_path
 
 
     def convert_pdf(
@@ -188,5 +232,8 @@ class PdfService:
 
         if delete_docx:
             self.delete_docx(docx_path)
+
+        path_pdf = self.transfer_pdf(path_pdf)
+
         logger.info("-" * 60)
         return path_pdf

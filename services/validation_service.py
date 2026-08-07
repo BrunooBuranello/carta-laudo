@@ -37,6 +37,12 @@ REQUIRED_COLUMNS = [
     "cpf_cnpj",
     "campo_correcao",
     "nome_assinante",
+    "sede_cidade_byd",
+    "data_carta_laudo",
+    "cabecalho_empresa",
+    "cabecalho_endereco",
+    "cabecalho_cep",
+    "empresa_cnpj",
 ]
 
 

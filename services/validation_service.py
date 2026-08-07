@@ -19,25 +19,24 @@ DEFAULT_FILE_NAME = "template_carta_laudo.docx"
 # ========================================
 
 REQUIRED_COLUMNS = [
-    # "veiculo",
+    "veiculo",
     "marca",
     "modelo",
-    # "descricao_modelo",
-    # "ano_modelo",
-    # "tipo_veiculo",
+    "ano_fabri_ano_modelo",
+    "tipo_veiculo",
     "chassis",
     "motor",
-    # "cor",
-    # "potencia",
-    # "cilindrada",
-    # "combustivel",
-    # "cmt",
-    # "pbt",
-    # "capacidade_passageiros",
-    # "nome_razao_social",
-    # "cpf_cnpj",
-    # "campo_correcao",
-    # "nome_assinante",
+    "cor",
+    "potencia",
+    "cilindrada",
+    "combustivel",
+    "cmt",
+    "pbt",
+    "capacidade_passageiros",
+    "nome_razao_social",
+    "cpf_cnpj",
+    "campo_correcao",
+    "nome_assinante",
 ]
 
 
@@ -48,13 +47,13 @@ REQUIRED_COLUMNS = [
 class ValidationService:
 
     # ========================================
-    # VALIDANDO COLUNAS OBRIGATÓRIAS
+    # VALIDANDO COLUNAS OBRIGATÓRIAS NO DF
     # ========================================
 
     def validate_columns(self,df: pd.DataFrame) -> pd.DataFrame:
         for column in REQUIRED_COLUMNS:
             if column not in df.columns:
-                raise ValueError (f"Coluna: '{column}' não encontrada no arquivo")
+                raise ValueError (f"Coluna: '{column}' não encontrada no arquivo no Excel.")
         return df
 
     # ========================================

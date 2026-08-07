@@ -31,12 +31,21 @@ UPPER_COLUMNS = [
 # Class para localização e leitura do excel para gerar o formulario.
 class ExcelService:
 
+    def _get_file_path(self) -> Path:
+        diretorio = input("Diretório: ").strip()
+        arquivo = input("Nome do arquivo: ").strip()
+        if not arquivo.endswith(".xlsx"):
+            arquivo += ".xlsx"
+        file_path = Path(diretorio) / arquivo
+        return file_path
+
+
     # ========================================
     # VALIDANDO SE O ARQUIVO EXISTE
     # ========================================
 
     # Valida se o diretorio existe, se o arquivo existe e se o formato esperado esta correto.
-    def file_exists(self, file_name: str = DEFAULT_FILE_NAME) -> Path:
+    def file_exists(self, file_name: Path = DEFAULT_FILE_NAME) -> Path:
         file_path = INPUT_DIR / file_name
         if not INPUT_DIR.is_dir():
             raise FileNotFoundError(f"Diretorio não encontrado:\n{INPUT_DIR}")
@@ -84,7 +93,8 @@ class ExcelService:
     # Leitura do DF, chama o localizador, leitura do excel, e tratamento das colunas.
     def read(self) -> pd.DataFrame:
 
-        file_path = self.file_exists()
+        file_path = self._get_file_path()
+        file_path = self.file_exists(file_path)
         logger.info(f"Lendo o aquivo: {file_path.name}")
         df = pd.read_excel(file_path,sheet_name=DEFAULT_SHEET_NAME,dtype=str)
         logger.info(f"Normalizando colunas: {file_path.name}")

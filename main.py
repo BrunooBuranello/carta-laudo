@@ -101,7 +101,7 @@ def main():
         logger.info("Registros lidos...........: %s", total_chassis)
         logger.info("DOCX processados..........: %s", documentos_docx_processados)
         logger.info("PDFs gerados..............: %s", documentos_pdf_gerados)
-        logger.exception("Erro durante a execução: %s", error)
+        logger.error(str(error))
         logger.info("##########################################################")
 
 

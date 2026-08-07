@@ -13,8 +13,7 @@ REQUIRED_COLUMNS = [
     "veiculo",
     "marca",
     "modelo",
-    "descricao_modelo",
-    "ano_modelo",
+    "ano_fabri_ano_modelo",
     "tipo_veiculo",
     "chassis",
     "motor",
@@ -29,6 +28,8 @@ REQUIRED_COLUMNS = [
     "cpf_cnpj",
     "campo_correcao",
     "nome_assinante",
+    "sede_cidade_byd",
+    "data_carta_laudo",
 ]
 
 

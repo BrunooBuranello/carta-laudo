@@ -25,6 +25,7 @@ NETWORK_PDF_DIR = Path(
     r"\02_Output_PDF_Emitidas"
 )
 
+
 class PdfService:
 
     def file_exists(self, docx_path: Path) -> Path:
@@ -100,7 +101,7 @@ class PdfService:
             logger.info("DOCX temporário removido: %s", docx_path.name)
 
 
-    def transfer_pdf(self, pdf_path: Path) -> Path:
+    def transfer_pdf(self, pdf_path: Path) -> tuple[Path, bool]:
 
         try:
             destino = NETWORK_PDF_DIR / pdf_path.name
@@ -122,7 +123,7 @@ class PdfService:
                 destino
             )
 
-            return destino
+            return destino, True
 
         except Exception as error:
             logger.warning(
@@ -132,14 +133,13 @@ class PdfService:
                 error,
             )
 
-            return pdf_path
-
+            return pdf_path, False
 
     def convert_pdf(
             self,
             docx_path: Path,
             delete_docx: bool = True,
-    ) -> Path:
+    ) -> tuple[Path, bool]:
 
         docx_path = self.file_exists(docx_path)
         path_pdf = docx_path.with_suffix(".pdf")
@@ -233,7 +233,7 @@ class PdfService:
         if delete_docx:
             self.delete_docx(docx_path)
 
-        path_pdf = self.transfer_pdf(path_pdf)
+        path_pdf, transferido = self.transfer_pdf(path_pdf)
 
         logger.info("-" * 60)
-        return path_pdf
+        return path_pdf, transferido
